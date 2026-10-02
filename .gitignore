@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-ssr
+.env
+.env.local
+.env.*.local
+*.local
+.DS_Store
+Thumbs.db
+npm-debug.log*
+.vite
+
+# Cowork scratch
+Claude outputs/

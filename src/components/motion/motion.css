@@ -1,0 +1,423 @@
+/*
+ * Motion layer for the homepage.
+ *
+ * Everything is scoped under .motion-root so it only affects the homepage.
+ * Every effect has a reduced-motion fallback at the bottom.
+ */
+
+/* ---------- scroll reveal ---------------------------------------------------- */
+
+.motion-root .m-reveal {
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--m-delay, 0ms),
+    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) var(--m-delay, 0ms);
+  will-change: opacity, transform;
+}
+.motion-root .m-reveal:not(.is-in) {
+  opacity: 0;
+  transform: translate3d(0, var(--m-y, 18px), 0);
+}
+.motion-root .m-reveal.is-in {
+  will-change: auto;
+}
+
+/* ---------- hero entrance (runs on load, no scroll needed) ------------------- */
+
+@keyframes m-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.motion-root .m-rise {
+  opacity: 0;
+  animation: m-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--m-delay, 0ms) forwards;
+}
+
+@keyframes m-word-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.42em, 0);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+.motion-root .m-word {
+  display: inline-block;
+  opacity: 0;
+  animation: m-word-in 0.95s cubic-bezier(0.22, 1, 0.36, 1) var(--m-delay, 0ms) forwards;
+}
+
+/* "Not doubts." — a slow light passing across the gradient */
+@keyframes m-shimmer {
+  0%,
+  100% {
+    background-position: 100% 50%;
+  }
+  50% {
+    background-position: 0% 50%;
+  }
+}
+.motion-root .m-shimmer {
+  background-image: linear-gradient(100deg, #5de7d5 0%, #14b8a6 28%, #b4f5ec 50%, #14b8a6 72%, #5de7d5 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: m-shimmer 7s ease-in-out infinite;
+}
+
+/* live dot */
+@keyframes m-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  80%,
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+.motion-root .m-ping {
+  position: relative;
+}
+.motion-root .m-ping::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: m-ping 2.4s cubic-bezier(0, 0, 0.2, 1) var(--m-delay, 0ms) infinite;
+}
+
+/* ---------- hero network ------------------------------------------------------- */
+
+.motion-root .m-network {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  -webkit-mask-image: radial-gradient(115% 95% at 68% 48%, #000 38%, rgba(0, 0, 0, 0.55) 68%, transparent 100%);
+  mask-image: radial-gradient(115% 95% at 68% 48%, #000 38%, rgba(0, 0, 0, 0.55) 68%, transparent 100%);
+}
+
+/* keeps the headline and paragraph crisp over the moving network */
+.motion-root .m-hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(55% 75% at 20% 50%, rgba(6, 13, 26, 0.88), rgba(6, 13, 26, 0.35) 60%, rgba(6, 13, 26, 0) 80%);
+}
+
+@media (max-width: 1023px) {
+  .motion-root .m-network {
+    opacity: 0.45;
+  }
+  .motion-root .m-hero-scrim {
+    background: linear-gradient(180deg, rgba(6, 13, 26, 0.75), rgba(6, 13, 26, 0.35) 55%, rgba(6, 13, 26, 0.6));
+  }
+}
+
+/* ---------- frosted-glass product panel over the turning globe ------------------ */
+/* Light enough that the globe reads through it as a soft shape, blurred enough
+   that the product names stay crisp. */
+.motion-root .m-glass {
+  background: linear-gradient(160deg, rgba(11, 23, 38, 0.52), rgba(6, 13, 26, 0.38));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 30px 80px -30px rgba(0, 0, 0, 0.7);
+  -webkit-backdrop-filter: blur(3px) saturate(1.3);
+  backdrop-filter: blur(3px) saturate(1.3);
+}
+
+/* ---------- cursor spotlight on cards ------------------------------------------- */
+
+.motion-root .m-spot {
+  position: relative;
+  isolation: isolate;
+}
+.motion-root .m-spot::before,
+.motion-root .m-spot::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+/* soft glow inside the card */
+.motion-root .m-spot::before {
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    420px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(45, 212, 191, 0.11),
+    transparent 45%
+  );
+}
+/* lit edge that follows the cursor */
+.motion-root .m-spot::after {
+  inset: -1px;
+  z-index: 1;
+  padding: 1px;
+  background: radial-gradient(
+    240px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(94, 231, 213, 0.7),
+    transparent 60%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+.motion-root .m-spot:hover::before,
+.motion-root .m-spot:hover::after {
+  opacity: 1;
+}
+
+/* service icon tile comes alive on hover (h-11 = the ServiceCard icon tile only) */
+.motion-root .m-spot > span.h-11:first-child {
+  transition:
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s ease,
+    background-color 0.4s ease;
+}
+.motion-root .m-spot:hover > span.h-11:first-child {
+  transform: translateY(-2px) rotate(-6deg);
+  box-shadow: 0 0 28px rgba(45, 212, 191, 0.35);
+  background-color: rgba(45, 212, 191, 0.18);
+}
+
+/* ---------- section eyebrow line ------------------------------------------------ */
+
+.motion-root .m-eyebrow-line {
+  display: inline-block;
+  height: 1px;
+  width: 0;
+  background: linear-gradient(90deg, rgba(45, 212, 191, 0), #2dd4bf);
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.25s;
+}
+.motion-root .m-reveal.is-in .m-eyebrow-line {
+  width: 22px;
+}
+
+/* ---------- stats band ------------------------------------------------------------ */
+
+.motion-root .m-count {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes m-travel {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+.motion-root .m-statband {
+  position: relative;
+  overflow: hidden;
+}
+.motion-root .m-statband::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(94, 231, 213, 0.9), transparent);
+  animation: m-travel 6s linear infinite;
+}
+
+/* ---------- process steps: a line that runs through 1 -> 4 --------------------- */
+/* The bar is a real element (.m-step-bar), not ::before, because the card also
+   carries .m-spot, which already uses both pseudo-elements for the cursor glow. */
+
+.motion-root .m-step-bar {
+  position: absolute;
+  top: -1px;
+  left: 1.25rem;
+  right: 1.25rem;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #14b8a6, #5de7d5);
+  box-shadow: 0 0 14px rgba(45, 212, 191, 0.55);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.55s cubic-bezier(0.65, 0, 0.35, 1) var(--m-step-delay, 0ms);
+  pointer-events: none;
+  z-index: 2;
+}
+.motion-root .m-reveal.is-in .m-step-bar {
+  transform: scaleX(1);
+}
+.motion-root .m-step-num {
+  transition:
+    color 0.4s ease calc(var(--m-step-delay, 0ms) + 450ms),
+    text-shadow 0.4s ease calc(var(--m-step-delay, 0ms) + 450ms);
+}
+.motion-root .m-reveal.is-in .m-step-num {
+  color: #5de7d5;
+  text-shadow: 0 0 18px rgba(45, 212, 191, 0.65);
+}
+
+/* ---------- gently floating icons ------------------------------------------------- */
+
+@keyframes m-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+.motion-root .m-float {
+  animation: m-float 5s ease-in-out var(--m-delay, 0ms) infinite;
+}
+
+/* ---------- button sheen ------------------------------------------------------------- */
+
+.motion-root .m-sheen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.motion-root .m-sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.motion-root .m-sheen:hover::after {
+  transform: translateX(120%);
+}
+
+/* ---------- call to action: travelling light border ------------------------------- */
+
+@property --m-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes m-spin {
+  to {
+    --m-angle: 360deg;
+  }
+}
+.motion-root .m-cta-frame {
+  border-radius: 1.5rem;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--m-angle),
+    rgba(45, 212, 191, 0.14) 0deg,
+    rgba(45, 212, 191, 0.14) 240deg,
+    rgba(94, 231, 213, 0.95) 300deg,
+    rgba(45, 212, 191, 0.14) 350deg
+  );
+  animation: m-spin 9s linear infinite;
+}
+
+@keyframes m-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-40px, 24px, 0) scale(1.1);
+  }
+}
+.motion-root .m-cta-orb {
+  position: absolute;
+  right: -6rem;
+  top: -6rem;
+  width: 22rem;
+  height: 22rem;
+  border-radius: 9999px;
+  background: rgba(45, 212, 191, 0.12);
+  filter: blur(60px);
+  animation: m-drift 14s ease-in-out infinite;
+  pointer-events: none;
+}
+.motion-root .m-cta-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 36px 36px;
+  -webkit-mask-image: radial-gradient(80% 90% at 85% 20%, #000, transparent 70%);
+  mask-image: radial-gradient(80% 90% at 85% 20%, #000, transparent 70%);
+}
+
+/* ---------- scroll progress ------------------------------------------------------------ */
+
+.m-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 60;
+  pointer-events: none;
+}
+.m-progress-bar {
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, #14b8a6, #5de7d5, #b4f5ec);
+  box-shadow: 0 0 12px rgba(45, 212, 191, 0.6);
+}
+
+/* ---------- reduced motion: everything visible, nothing moving ------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-root .m-reveal,
+  .motion-root .m-reveal:not(.is-in),
+  .motion-root .m-rise,
+  .motion-root .m-word {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+  .motion-root .m-step-bar {
+    transform: scaleX(1) !important;
+    transition: none !important;
+  }
+  .motion-root .m-shimmer,
+  .motion-root .m-cta-frame,
+  .motion-root .m-cta-orb,
+  .motion-root .m-float,
+  .motion-root .m-ping::after,
+  .motion-root .m-statband::before {
+    animation: none !important;
+  }
+  .motion-root .m-ping::after,
+  .motion-root .m-statband::before {
+    display: none;
+  }
+}
